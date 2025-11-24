@@ -3,37 +3,48 @@ import gnomeImg from './assets/gnome.png';
 
 document.addEventListener('DOMContentLoaded', () => {
   const field = document.getElementById('game-field');
-  
-  // Создаём поле 4x4
-  for (let i = 0; i < 16; i++) {
+
+  // Создаём поле 4x4 (16 ячеек)
+  const cells = Array.from({ length: 16 }, () => {
     const cell = document.createElement('div');
     cell.classList.add('cell');
-    field.appendChild(cell);
-  }
+    field.append(cell);
+    return cell;
+  });
 
-  const cells = document.querySelectorAll('.cell');
   const gnome = document.createElement('img');
   gnome.src = gnomeImg;
   gnome.alt = 'Гном';
   gnome.classList.add('gnome');
 
-  // Функция случайной клетки (не текущей)
-  function getRandomCell(exclude = null) {
+  // Функция для получения случайной ячейки (исключая текущую)
+  const getRandomCell = (exclude = null) => {
     let cell;
     do {
       cell = cells[Math.floor(Math.random() * cells.length)];
     } while (cell === exclude);
     return cell;
-  }
+  };
 
-  // Начальная позиция
+  // Начальная позиция гнома
   let currentCell = getRandomCell();
-  currentCell.appendChild(gnome);
+  currentCell.append(gnome);
 
-  // Перемещение каждые 1.5 сек
-  setInterval(() => {
+  const moveInterval = setInterval(() => {
     const newCell = getRandomCell(currentCell);
-    newCell.appendChild(gnome);  // Меняем родителя — гном "перемещается" автоматически
+    newCell.append(gnome);
     currentCell = newCell;
   }, 1500);
+  
+  const stopButton = document.getElementById('stop-game');
+  if (stopButton) {
+    stopButton.addEventListener('click', () => {
+      clearInterval(moveInterval);
+      console.log('Игра остановлена, интервал очищен');
+    });
+  }
+
+  window.addEventListener('beforeunload', () => {
+    clearInterval(moveInterval);
+  });
 });
